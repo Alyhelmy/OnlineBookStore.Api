@@ -36,6 +36,29 @@ The API uses settings from:
 - `OnlineBookStore.Api/Modules/Auth` - authentication features
 - `OnlineBookStore.Api/Shared` - shared infrastructure and utilities
 
+## API Endpoints
+
+Base URL (local): `https://localhost:<port>/api`
+
+### Auth
+
+- `POST /api/auth/register`
+  - Registers a new user.
+  - Body: `RegisterRequest`
+  - Responses: `200 OK` on success, `400 Bad Request` on validation/business failure.
+- `POST /api/auth/login`
+  - Intended login endpoint using `LoginRequest`.
+  - Note: the `Login` action exists in code but is not currently decorated with an HTTP attribute, so this route is not exposed yet.
+
+### Books
+
+- `GET /api/books`
+  - Returns all books.
+  - Response: `200 OK` with a list of books.
+- `GET /api/books/{id}`
+  - Returns one book by ID.
+  - Responses: `200 OK` when found, `404 Not Found` when the book does not exist.
+
 ## Notes
 
 - Keep secrets (connection strings, JWT keys) out of source control.
