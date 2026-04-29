@@ -1,0 +1,15 @@
+.vs/
+**/bin/
+**/obj/
+**/Logs/
+*.user
+*.suo
+*.cache
+*.log
+*.db
+*.sqlite
+*.pdb
+
+# OS / editor
+.DS_Store
+Thumbs.db
