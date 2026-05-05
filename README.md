@@ -1,65 +1,89 @@
-# OnlineBookStore.Api
+# Online Book Store
 
-ASP.NET Core Web API for an online bookstore with modular structure for books and authentication.
+A fullstack online book store application built with **.NET Web API**, **Angular**, and **PostgreSQL**.
+
+The project supports customer book browsing, authentication, cart checkout, order tracking, admin book management, admin order status updates, structured logging, validation, and Docker setup.
+
+---
 
 ## Tech Stack
 
-- ASP.NET Core
+### Backend
+- .NET Web API
 - Entity Framework Core
-- SQL Server
+- PostgreSQL
 - JWT Authentication
+- Role-based Authorization
+- Serilog Logging
+- Docker
 
-## Getting Started
+### Frontend
+- Angular
+- TypeScript
+- Angular Routing
+- HttpClient
+- Auth Guard
+- HTTP Interceptors
+- LocalStorage Cart
 
-### Prerequisites
+### Database
+- PostgreSQL
 
-- .NET SDK 9.0+
-- SQL Server instance
+---
 
-### Run Locally
+## Main Features
 
-1. Restore dependencies:
-   - `dotnet restore`
-2. Apply migrations:
-   - `dotnet ef database update --project OnlineBookStore.Api`
-3. Run the API:
-   - `dotnet run --project OnlineBookStore.Api`
+### Customer Features
+- Register and login
+- Browse books
+- View book details
+- Add books to cart
+- Update cart quantity
+- Checkout
+- View personal orders
+- Track order status
 
-The API uses settings from:
+### Admin Features
+- Add books
+- Edit books
+- Delete books
+- Update book stock
+- View all orders
+- View customer name and email for each order
+- Update order status
 
-- `OnlineBookStore.Api/appsettings.json`
-- `OnlineBookStore.Api/appsettings.Development.json`
+### Security Features
+- JWT authentication
+- Role-based authorization
+- Admin-only endpoints
+- Token expiry handling in Angular
+- Secrets moved out of source code using `.env` and User Secrets
+
+### Logging and Error Handling
+- Global exception middleware
+- Serilog logging
+- Hidden request ID for internal error tracing
+- Angular global error banner
+
+---
 
 ## Project Structure
 
-- `OnlineBookStore.Api/Modules/Books` - book features
-- `OnlineBookStore.Api/Modules/Auth` - authentication features
-- `OnlineBookStore.Api/Shared` - shared infrastructure and utilities
-
-## API Endpoints
-
-Base URL (local): `https://localhost:<port>/api`
-
-### Auth
-
-- `POST /api/auth/register`
-  - Registers a new user.
-  - Body: `RegisterRequest`
-  - Responses: `200 OK` on success, `400 Bad Request` on validation/business failure.
-- `POST /api/auth/login`
-  - Intended login endpoint using `LoginRequest`.
-  - Note: the `Login` action exists in code but is not currently decorated with an HTTP attribute, so this route is not exposed yet.
-
-### Books
-
-- `GET /api/books`
-  - Returns all books.
-  - Response: `200 OK` with a list of books.
-- `GET /api/books/{id}`
-  - Returns one book by ID.
-  - Responses: `200 OK` when found, `404 Not Found` when the book does not exist.
-
-## Notes
-
-- Keep secrets (connection strings, JWT keys) out of source control.
-- Update configuration values per environment before deployment.
+```text
+OnlineBookStore.Api
+│
+├── Modules
+│   ├── Auth
+│   ├── Books
+│   └── Orders
+│
+├── Shared
+│   ├── Data
+│   ├── Helpers
+│   ├── Middleware
+│   └── Enums
+│
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── README.md
