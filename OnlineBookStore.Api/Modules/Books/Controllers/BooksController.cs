@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using OnlineBookStore.Api.Modules.Books.DTOs;
 using OnlineBookStore.Api.Modules.Books.Interfaces;
 
 namespace OnlineBookStore.Api.Modules.Books.Controllers
@@ -21,6 +23,7 @@ namespace OnlineBookStore.Api.Modules.Books.Controllers
             return Ok(books); // we return an HTTP 200 OK response with the list of books as the response body.
         }
 
+        
         [HttpGet("{id}")] // we added an action method named GetBookById that takes an integer id as a parameter. This method will handle HTTP GET requests to the "api/books/{id}" endpoint, where {id} is a placeholder for the book ID.
         public async Task<IActionResult> GetBookById(int id)
         { 
@@ -30,6 +33,42 @@ namespace OnlineBookStore.Api.Modules.Books.Controllers
                 return NotFound($"Book with ID {id} was not found. :(");
 
             return Ok(book);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> CreateBook(CreateBookRequest request)
+        {
+            var result = await _bookService.CreateBookAsync(request);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBook(int id, UpdateBookRequest request)
+        {
+            var result = await _bookService.UpdateBookAsync(id, request);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            var result = await _bookService.DeleteBookAsync(id);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
         }
     }
 }

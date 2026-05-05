@@ -9,6 +9,8 @@
 *.db
 *.sqlite
 *.pdb
+.env
+*.env
 
 # OS / editor
 .DS_Store

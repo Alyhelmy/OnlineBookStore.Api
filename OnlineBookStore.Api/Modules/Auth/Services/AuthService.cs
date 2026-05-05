@@ -9,12 +9,16 @@ namespace OnlineBookStore.Api.Modules.Auth.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly ITokenService _tokenService;
         private readonly AppDbContext _context;
 
-        public AuthService(AppDbContext context)
+        public AuthService(AppDbContext context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
+
+
 
         public async Task<ServiceResult<AuthResponse>> RegisterAsync(RegisterRequest request)
         {
@@ -41,7 +45,7 @@ namespace OnlineBookStore.Api.Modules.Auth.Services
                 Email = user.Email,
                 FullName = user.FullName,
                 Role = user.Role,
-                Token = "" 
+                Token = _tokenService.CreateToken(user)
             }, "Registration successful");
 
         }
@@ -68,7 +72,7 @@ namespace OnlineBookStore.Api.Modules.Auth.Services
                 Email = user.Email,
                 FullName = user.FullName,
                 Role = user.Role,
-                Token = "" 
+                Token = _tokenService.CreateToken(user)
             }, "Login successful");  
 
         }

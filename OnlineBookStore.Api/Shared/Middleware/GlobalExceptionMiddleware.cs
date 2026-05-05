@@ -37,7 +37,7 @@ namespace OnlineBookStore.Api.Shared.Middleware
                 var response = new  // we create an anonymous object to represent the error response that we will send back to the client. This object contains a message property with a generic error message and a requestId property with the request ID for traceability.
                 {
                     message = "Something went wrong.",
-                    requestId = requestId   
+                   // requestId = requestId   
                 };
 
                 var json = JsonSerializer.Serialize(response); 

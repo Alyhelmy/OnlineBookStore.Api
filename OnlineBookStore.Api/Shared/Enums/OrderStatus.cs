@@ -1,6 +1,11 @@
 ﻿namespace OnlineBookStore.Api.Shared.Enums
 {
-    public class OrderStatus
+    public enum OrderStatus
     {
+        Pending = 1,
+        Processing = 2,
+        Shipped = 3,
+        Delivered =4,
+        Cancelled =5
     }
 }

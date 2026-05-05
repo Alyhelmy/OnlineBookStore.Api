@@ -5,9 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>03a7e60a-ed08-449b-998f-9b3d826ae60e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
@@ -28,10 +30,6 @@
     <Folder Include="Modules\Cart\DTOs\" />
     <Folder Include="Modules\Cart\Models\" />
     <Folder Include="Modules\Cart\Services\" />
-    <Folder Include="Modules\Orders\Controllers\" />
-    <Folder Include="Modules\Orders\DTOs\" />
-    <Folder Include="Modules\Orders\Models\" />
-    <Folder Include="Modules\Orders\Services\" />
     <Folder Include="Shared\Logging\" />
   </ItemGroup>
 
