@@ -88,7 +88,8 @@ namespace OnlineBookStore.Api
             {
                 options.AddPolicy("AllowAngularClient", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.WithOrigins("http://localhost:4200",
+                       "https://onlinebookstore.app" )
                     .AllowAnyHeader()
                     .AllowAnyMethod();
                 });
