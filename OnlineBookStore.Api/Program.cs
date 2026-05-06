@@ -13,6 +13,8 @@ using System.Text;
 using OnlineBookStore.Api.Shared.Helpers;
 using OnlineBookStore.Api.Modules.Orders.Interfaces;
 using OnlineBookStore.Api.Modules.Orders.Services;
+using OnlineBookStore.Api.Modules.Admin.Interfaces;
+using OnlineBookStore.Api.Modules.Admin.Services;
 
 
 namespace OnlineBookStore.Api
@@ -83,6 +85,8 @@ namespace OnlineBookStore.Api
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             builder.Services.AddScoped<IOrderService, OrderService>();
+
+            builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 
             builder.Services.AddCors(options =>  
             {
