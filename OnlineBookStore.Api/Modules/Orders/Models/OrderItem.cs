@@ -6,6 +6,8 @@
 
         public int OrderId { get; set; } // this property represents the foreign key relationship to the Order class. It indicates which order this item belongs to
 
+        public Order Order { get; set; } = null!;
+
         public int BookId { get; set; }
 
         public string BookTitle { get; set; } = string.Empty;

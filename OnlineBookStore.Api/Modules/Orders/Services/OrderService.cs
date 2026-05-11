@@ -2,8 +2,11 @@
 using OnlineBookStore.Api.Modules.Orders.DTOs;
 using OnlineBookStore.Api.Modules.Orders.Interfaces;
 using OnlineBookStore.Api.Modules.Orders.Models;
+using OnlineBookStore.Api.Modules.Cart.Models;
 using OnlineBookStore.Api.Shared.Data;
 using OnlineBookStore.Api.Shared.Helpers;
+using OnlineBookStore.Api.Shared.Enums;
+using OnlineBookStore.Api.Modules.Cart.DTOs;
 
 namespace OnlineBookStore.Api.Modules.Orders.Services
 {
@@ -19,80 +22,87 @@ namespace OnlineBookStore.Api.Modules.Orders.Services
             _currentUserService = currentUserService;
         }
 
-        public async Task<ServiceResult<OrderResponse>> CreateOrderAsync(CreateOrderRequest request)
+        public async Task<ServiceResult<OrderResponse>> CreateOrderAsync()
         {
             var userId = _currentUserService.UserId;
 
-            if (userId == null)
-                return ServiceResult<OrderResponse>.Failure("User not authenticated.");
-
-            if (request.Items == null || !request.Items.Any())
-                return ServiceResult<OrderResponse>.Failure("Order must contain at least one item.");
-
-            var orderItems = new List<OrderItem>();
-            decimal totalAmount = 0;
-
-            foreach (var item in request.Items)
+            using var transaction = await _context.Database
+                .BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead);
+            try
             {
-                var book = await _context.Books
-                    .FirstOrDefaultAsync(b => b.Id == item.BookId);
 
-                if (book == null)
-                    return ServiceResult<OrderResponse>.Failure($"Book with ID {item.BookId} was not found"); //i want to return book title instead of id
+                var cartItems = await _context.CartItems
+                    .Include(cartItem => cartItem.Book)
+                    .Where(cartItem => cartItem.UserId == userId)
+                    .ToListAsync();
 
-                if (item.Quantity <= 0)
-                    return ServiceResult<OrderResponse>.Failure($"Quantity must be greater than zero");
-
-                if (book.StockQuantity < item.Quantity)
-                    return ServiceResult<OrderResponse>.Failure($"Not enough stock for book '{book.Title}'");
-
-                var itemTotal = book.Price * item.Quantity;
-
-                book.StockQuantity -= item.Quantity;
-
-                orderItems.Add(new OrderItem  //we are creating order items based on the request and the book details
+                if (cartItems.Count == 0)
                 {
-                    BookId = book.Id,
-                    BookTitle = book.Title,
-                    Author = book.Author,
-                    UnitPrice = book.Price,
-                    Quantity = item.Quantity,
-                    TotalPrice = itemTotal
+                    return ServiceResult<OrderResponse>.Failure("Cart is empty");
+                }
 
-                });
-                totalAmount += itemTotal;
+                foreach (var cartItem in cartItems)
+                {
+                    if (cartItem.Quantity > cartItem.Book.StockQuantity)
+                    {
+                        return ServiceResult<OrderResponse>.Failure($"Not enough stock for book: {cartItem.Book.Title}");
+                    }
+                }
+
+                decimal totalPrice = cartItems.Sum(cartItem =>
+                cartItem.Book.Price * cartItem.Quantity);
+
+                var order = new Order
+                {
+                    UserId = userId.Value,
+                    Status = OrderStatus.Pending,
+                    TotalAmount = totalPrice,
+                    CreatedAt = DateTime.UtcNow,
+                    OrderItems = cartItems.Select(cartItem => new OrderItem
+                    {
+                        BookId = cartItem.BookId,
+                        Quantity = cartItem.Quantity,
+                        UnitPrice = cartItem.Book.Price,
+                        TotalPrice = cartItem.Book.Price * cartItem.Quantity
+                    }).ToList()
+                };
+
+                foreach (var cartItem in cartItems)
+                {
+                    cartItem.Book.StockQuantity -= cartItem.Quantity;
+                }
+
+                _context.Orders.Add(order);
+                _context.CartItems.RemoveRange(cartItems);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+
+                var response = new OrderResponse
+                {
+                    Id = order.Id,
+                    Status = order.Status.ToString(),
+                    TotalAmount = order.TotalAmount,
+                    CreatedAt = order.CreatedAt,
+                    Items = order.OrderItems.Select(orderItem => new OrderItemResponse
+                    {
+                        BookId = orderItem.BookId,
+                        Quantity = orderItem.Quantity,
+                        UnitPrice = orderItem.UnitPrice,
+                        TotalPrice = orderItem.TotalPrice
+                    }).ToList()
+                };
+
+                return ServiceResult<OrderResponse>
+                    .Success(response, "Order created successfully.");
+
             }
-
-            var order = new Order  //we are creating the order based on the user id, total amount and the order items we created above
+            catch (Exception ex) 
             {
-                UserId = userId.Value, //value means we are sure that userId is not null because we checked it above
-                TotalAmount = totalAmount,
-                OrderItems = orderItems
-            };
-
-            _context.Orders.Add(order); //we are adding the order to the database context
-            await _context.SaveChangesAsync();
-
-
-            var response = new OrderResponse  //we are creating the response based on the order we just created and saved to the database
-            {
-                Id = order.Id,
-                TotalAmount = order.TotalAmount,
-                Status = order.Status.ToString(),
-                CreatedAt = DateTime.UtcNow,
-                Items = order.OrderItems.Select(item => new OrderItemResponse
-                {
-                    BookId = item.BookId,
-                    BookTitle = item.BookTitle,
-                    Author = item.Author,
-                    UnitPrice = item.UnitPrice,
-                    Quantity = item.Quantity,
-                    TotalPrice = item.TotalPrice,  
-                }).ToList()
-            };
-
-            return ServiceResult<OrderResponse>.Success(response, "Order created successfully."); 
-
+                await transaction.RollbackAsync();
+                return ServiceResult<OrderResponse>.Failure("An error occurred while creating your order.");
+            }
         }
 
         public async Task<ServiceResult<List<OrderResponse>>> GetMyOrdersAsync()

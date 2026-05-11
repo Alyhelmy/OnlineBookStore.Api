@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\Cart\Controllers\" />
-    <Folder Include="Modules\Cart\DTOs\" />
-    <Folder Include="Modules\Cart\Models\" />
-    <Folder Include="Modules\Cart\Services\" />
     <Folder Include="Shared\Logging\" />
   </ItemGroup>
 

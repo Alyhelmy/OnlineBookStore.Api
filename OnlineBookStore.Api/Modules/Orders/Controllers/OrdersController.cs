@@ -19,17 +19,19 @@ namespace OnlineBookStore.Api.Modules.Orders.Controllers
             _orderService = orderService;
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(CreateOrderRequest request)
+        [Authorize]
+        public async Task<IActionResult> CreateOrder()
         {
-            var result = await _orderService.CreateOrderAsync(request);
+            var result = await _orderService.CreateOrderAsync();
 
             if (!result.IsSuccess)
-                return BadRequest(result);
-
+            {
+                return UnprocessableEntity(result); //Correct HTTP semantics — request was valid, business rule blocked it
+            }
             return Ok(result);
         }
+
 
         [HttpGet("my-orders")]
         public async Task<IActionResult> GetMyOrders()

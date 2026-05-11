@@ -15,13 +15,16 @@ using OnlineBookStore.Api.Modules.Orders.Interfaces;
 using OnlineBookStore.Api.Modules.Orders.Services;
 using OnlineBookStore.Api.Modules.Admin.Interfaces;
 using OnlineBookStore.Api.Modules.Admin.Services;
+using OnlineBookStore.Api.Modules.Cart.Interfaces;
+using OnlineBookStore.Api.Modules.Cart.Services;
+
 
 
 namespace OnlineBookStore.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +89,8 @@ namespace OnlineBookStore.Api
 
             builder.Services.AddScoped<IOrderService, OrderService>();
 
+            builder.Services.AddScoped<ICartService, CartService>();
+
             builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 
             builder.Services.AddCors(options =>  
@@ -101,19 +106,19 @@ namespace OnlineBookStore.Api
 
             var app = builder.Build();
 
-            
-
             // Configure the HTTP request pipeline.
+
             if (app.Environment.IsDevelopment()) 
             {
                 app.MapOpenApi();
             }
 
+
             using (var scope = app.Services.CreateScope()) //When the application starts, create a temporary dependency injection scope, ask ASP.NET for a valid AppDbContext instance, then run the seeding logic using that database connection, then dispose everything.
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 dbContext.Database.Migrate();
-                DataSeeder.SeedBooks(dbContext); // Seed initial data
+               await DataSeeder.SeedBooksAsync(dbContext); // Seed initial data
             }
 
            // app.UseMiddleware<RequestIdMiddleware>();

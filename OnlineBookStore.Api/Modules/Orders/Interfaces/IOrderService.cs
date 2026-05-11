@@ -6,7 +6,7 @@ namespace OnlineBookStore.Api.Modules.Orders.Interfaces
     public interface IOrderService
     {
 
-        Task<ServiceResult<OrderResponse>> CreateOrderAsync(CreateOrderRequest request); // Create a new order for the currently authenticated user
+        Task<ServiceResult<OrderResponse>> CreateOrderAsync(); // Create a new order for the currently authenticated user
 
         Task<ServiceResult<List<OrderResponse>>> GetMyOrdersAsync(); // Get orders for the currently authenticated user
 

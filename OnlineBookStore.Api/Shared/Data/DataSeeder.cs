@@ -1,12 +1,15 @@
 ﻿using OnlineBookStore.Api.Modules.Books.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace OnlineBookStore.Api.Shared.Data
 {
     public static class DataSeeder
     {
-        public static void SeedBooks(AppDbContext context)
+        public static async Task SeedBooksAsync(AppDbContext context)
         {
-            if (context.Books.Any())
+            if (await context.Books.AnyAsync())
                 return; // Data already seeded
+
             var books = new List<Book> //we created a list of Book objects to represent the initial data we want to seed into our database. Each Book object has properties that correspond to the columns in our Books table
             {
                 new Book
@@ -62,7 +65,7 @@ namespace OnlineBookStore.Api.Shared.Data
                 }
             };
             context.Books.AddRange(books); //we use the AddRange method of the Books DbSet to add all the Book objects in our list to the database context. This prepares them to be inserted into the database when we call SaveChanges.
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }
