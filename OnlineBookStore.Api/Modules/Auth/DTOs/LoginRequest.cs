@@ -4,15 +4,12 @@ namespace OnlineBookStore.Api.Modules.Auth.DTOs
 {
     public class LoginRequest
     {
-        [Required]
-        [EmailAddress]
-        [RegularExpression(
-            @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-            ErrorMessage = "Please enter a valid email address."
-        )]
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [StringLength(256)]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; } = string.Empty;
     }
 }

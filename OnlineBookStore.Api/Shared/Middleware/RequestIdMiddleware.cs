@@ -19,6 +19,7 @@ namespace OnlineBookStore.Api.Shared.Middleware
             }
 
             context.Response.Headers["X-Request-ID"] = requestId; // we add the request ID to the response headers, so that the client can see the request ID associated with their request in the response.
+            context.Items["RequestId"] = requestId;
 
             using (LogContext.PushProperty("RequestId", requestId)) // we use Serilog's LogContext to push the request ID as a property that will be included in all log entries created during the processing of this request. This allows us to easily correlate log entries with specific requests by including the request ID in our log output.
             {

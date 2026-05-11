@@ -17,6 +17,7 @@ using OnlineBookStore.Api.Modules.Admin.Interfaces;
 using OnlineBookStore.Api.Modules.Admin.Services;
 using OnlineBookStore.Api.Modules.Cart.Interfaces;
 using OnlineBookStore.Api.Modules.Cart.Services;
+using OnlineBookStore.Api.Shared.Extensions;
 
 
 
@@ -47,6 +48,8 @@ namespace OnlineBookStore.Api
 
             // Add services to the container.
 
+            builder.Services.AddApplicationServices();
+
             builder.Services.AddControllers();
             
             builder.Services.AddOpenApi();
@@ -55,12 +58,6 @@ namespace OnlineBookStore.Api
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddEndpointsApiExplorer();
-
-            builder.Services.AddScoped<IBookService, BookService>(); // we registered the BookService class as the implementation for the IBookService interface in the dependency injection container. This means that whenever a component (like a controller) requests an IBookService, the framework will provide an instance of BookService. The AddScoped method indicates that the same instance will be used within a single request, but a new instance will be created for each new request.
-
-            builder.Services.AddScoped<IAuthService,AuthService>();  
-
-            builder.Services.AddScoped<ITokenService, TokenService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) 
                 .AddJwtBearer(options =>
@@ -85,13 +82,7 @@ namespace OnlineBookStore.Api
 
             builder.Services.AddHttpContextAccessor(); // we added the AddHttpContextAccessor() method to the service collection. This registers the IHttpContextAccessor service, which allows us to access the current HTTP context (including request and response information) from anywhere in our application, such as in our custom middleware or services. This is particularly useful for logging contextual information like request IDs or user details in our logs
 
-            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-            builder.Services.AddScoped<IOrderService, OrderService>();
-
-            builder.Services.AddScoped<ICartService, CartService>();
-
-            builder.Services.AddScoped<IAdminUserService, AdminUserService>();
+            
 
             builder.Services.AddCors(options =>  
             {
@@ -121,7 +112,7 @@ namespace OnlineBookStore.Api
                await DataSeeder.SeedBooksAsync(dbContext); // Seed initial data
             }
 
-           // app.UseMiddleware<RequestIdMiddleware>();
+            app.UseMiddleware<RequestIdMiddleware>();
 
             app.UseMiddleware<GlobalExceptionMiddleware>();
 
